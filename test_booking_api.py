@@ -1,3 +1,4 @@
+from requests import auth
 import requests
 import pytest
 

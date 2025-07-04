@@ -1,5 +1,4 @@
 from http.client import responses
-
 from services.booking.payload import PayloadBookings
 from services.booking.endpoints import EndpointsBooking
 from requests import Response

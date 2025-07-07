@@ -70,9 +70,9 @@ Firstname for the guest who made the booking
             lastname: str = None,
             totalprice: float = None,
             depositpaid: bool = None,
-            bookingdates: dict = None,
             checkin: str = None,
             checkout: str = None,
+            bookingdates: dict = None,
             additionalneeds: str = None
     ) -> dict:
         """
@@ -82,6 +82,7 @@ Firstname for the guest who made the booking
         :param lastname: Lastname for the guest who made the booking
         :param totalprice: The total price for the booking
         :param depositpaid: Whether the deposit has been paid or not
+        :param bookingdates: Dict w checkin and checkout dates
         :param checkin: str, YYYY-MM-DD, Date the guest is checking in
         :param checkout: str, YYYY-MM-DD, Date the guest is checking out
         :param additionalneeds: Any other needs the guest has

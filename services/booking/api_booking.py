@@ -47,8 +47,8 @@ class Bookings:
         return response
 
     @allure.step('Put request to update booking')
-    def post_update_booking(self, booking_id: int, **data):
-        response = requests.post(
+    def put_update_booking(self, booking_id: int, **data):
+        response = requests.put(
             url=self.endpoints.update_booking(booking_id),
             json=self.payload.post_booking_data(**data),
             auth=self.payload.basic_auth()

@@ -10,7 +10,7 @@ from basetest import BaseTest
 
 class TestBookingApi(BaseTest):
 
-    @pytest.fixture()
+    @pytest.fixture(scope="function")
     def create_and_delete_booking(self):
         data = PLB.post_booking_data(
             firstname='mark',
@@ -113,12 +113,12 @@ class TestBookingApi(BaseTest):
             "additionalneeds": "Sleeping Bag"
         })
     ])
-    def test_post_create_booking_negative_incorrect_total_price(self, case,data):
+    def test_post_create_booking_negative(self, case,data):
         allure.dynamic.title(case)
         response = self.booking.post_create_booking(**data)
         assert response.status_code == 200, response.json()
 
-
+    @pytest.mark.api_positive
     @pytest.mark.parametrize(
         'case,data',
         [
@@ -132,25 +132,80 @@ class TestBookingApi(BaseTest):
         ))
         ]
     )
-    def test_update_booking_positive(self, case, data, create_and_delete_booking):
-        print(type(case),case, type(data),data)
+    def test_update_booking_positive(self, create_and_delete_booking, case, data):
         allure.dynamic.title(case)
-        response = self.booking.post_update_booking(create_and_delete_booking,**data)
-        print(response.json())
+        response = self.booking.put_update_booking(create_and_delete_booking,**data)
+        assert response.status_code == 200, response.json()
+
+    @pytest.mark.api_negative
+    @pytest.mark.parametrize(
+        'case,data',
+        [
+            ('Negative case w string total_price', PLB.post_booking_data(
+                firstname='mark',
+                lastname='bybin',
+                totalprice='hellototal',
+                depositpaid=True,
+                bookingdates={'checkin': '2025-07-08', 'checkout': '2025-07-10'},
+                additionalneeds='Nothing'
+            )),
+            ('Negative case w string total_price', PLB.post_booking_data(
+                firstname='mark',
+                lastname='bybin',
+                totalprice=200,
+                depositpaid='hellodeposit',
+                bookingdates={'checkin': '2025-07-08', 'checkout': '2025-07-10'},
+                additionalneeds='Nothing'
+            ))
+        ]
+    )
+    def test_update_booking_negative(self, create_and_delete_booking, case, data):
+        allure.dynamic.title(case)
+        response = self.booking.put_update_booking(create_and_delete_booking, **data)
+        assert response.status_code == 200, response.json()
+
+
+    @pytest.mark.api_positive
+    @pytest.mark.parametrize(
+        'case, data',
+        [
+            ('Positive case w 3 fields', PLB.patch_booking_data(
+                firstname='mark',
+                bookingdates={'checkin': '2025-07-26', 'checkout': '2025-07-30'},
+                additionalneeds='Nothing'
+            )),
+            ('Positive case w 4 fields', PLB.patch_booking_data(
+                lastname='watson',
+                depositpaid=False,
+                bookingdates={'checkin': '2028-07-26', 'checkout': '2028-07-30'},
+                additionalneeds='WiFi, Coke and laptop'
+            ))
+        ]
+    )
+    def test_patch_booking_positive(self, create_and_delete_booking, case, data):
+        allure.dynamic.title(case)
+        response = self.booking.partial_update_booking(create_and_delete_booking, **data)
         assert response.status_code == 200, response.json()
 
     @pytest.mark.wip
-    def test_hello(self, create_and_delete_booking):
-
-        data = PLB.post_booking_data(
-            firstname='mark',
-            lastname='bybin',
-            totalprice=200,
-            depositpaid=True,
-            bookingdates={'checkin': '2025-07-08', 'checkout': '2025-07-10'},
-            additionalneeds='Nothing'
-        )
-        response = self.booking.post_update_booking(create_and_delete_booking, **data)
-        print(response.json())
+    @pytest.mark.parametrize(
+        'case, data',
+        [
+            ('Negative case w wrong dates', PLB.patch_booking_data(
+                firstname='mark',
+                bookingdates={'checkin': '2023-07-26', 'checkout': '2021-07-30'},
+                additionalneeds='Nothing'
+            )),
+            ('Negative case w incorrect last and firstname', PLB.patch_booking_data(
+                firstname='fjds;aljsdklfaskdhfsdjkfhas;413212412fdsakhjfads;klhfds;akhlgajskd;',
+                lastname='fsda;lkghdsapoaisdhgsadopsgdsagd[dfsan;fdslkjfsda',
+                depositpaid=False,
+                bookingdates={'checkin': '2028-07-26', 'checkout': '2028-07-30'},
+                additionalneeds='WiFi, Coke and laptop'
+            ))
+        ]
+    )
+    def test_patch_booking_negative(self, create_and_delete_booking, case, data):
+        allure.dynamic.title(case)
+        response = self.booking.partial_update_booking(create_and_delete_booking, **data)
         assert response.status_code == 200, response.json()
-

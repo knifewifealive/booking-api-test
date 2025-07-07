@@ -6,7 +6,6 @@ from dotenv import load_dotenv
 load_dotenv()
 LOGIN = os.getenv("LOGIN")
 PASSWORD = os.getenv("PASSWORD")
-print(LOGIN,PASSWORD)
 
 class PayloadBookings:
 
@@ -37,8 +36,7 @@ class PayloadBookings:
             lastname: str,
             totalprice: float,
             depositpaid: bool,
-            checkin: str,
-            checkout: str,
+            bookingdates: dict,
             additionalneeds: str
     ) -> dict:
         """
@@ -48,21 +46,20 @@ Firstname for the guest who made the booking
         :param lastname: Lastname for the guest who made the booking
         :param totalprice: The total price for the booking
         :param depositpaid: Whether the deposit has been paid or not
-        :param checkin: str, YYYY-MM-DD, Date the guest is checking in
-        :param checkout: str, YYYY-MM-DD, Date the guest is checking out
+        :param bookingdates: dict w checkin and checkout values
         :param additionalneeds: Any other needs the guest has
         :return: dictionary with params above
         """
         data = {
-            "firstname": firstname,
-            "lastname": lastname,
-            "totalprice": totalprice,
-            "depositpaid": depositpaid,
-            "bookingdates": {
-                "checkin": checkin,
-                "checkout": checkout
+            'firstname': firstname,
+            'lastname': lastname,
+            'totalprice': totalprice,
+            'depositpaid': depositpaid,
+            'bookingdates': {
+                'checkin': bookingdates['checkin'],
+                'checkout': bookingdates['checkout']
             },
-            "additionalneeds": additionalneeds
+            'additionalneeds': additionalneeds
         }
 
         return data
@@ -73,8 +70,9 @@ Firstname for the guest who made the booking
             lastname: str = None,
             totalprice: float = None,
             depositpaid: bool = None,
-            checkin: str = None,  # формат YYYY-MM-DD
-            checkout: str = None,  # формат YYYY-MM-DD
+            bookingdates: dict = None,
+            checkin: str = None,
+            checkout: str = None,
             additionalneeds: str = None
     ) -> dict:
         """
@@ -100,8 +98,11 @@ Firstname for the guest who made the booking
             data["totalprice"] = totalprice
         if depositpaid is not None:
             data["depositpaid"] = depositpaid
-        if checkin or checkout:
-            data["bookingdates"] = {}
+        if bookingdates:
+            data["bookingdates"] = {
+                'checkin': bookingdates['checkin'],
+                'checkout': bookingdates['checkout']
+            }
             if checkin:
                 data["bookingdates"]["checkin"] = checkin
             if checkout:

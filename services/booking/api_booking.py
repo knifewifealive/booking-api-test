@@ -1,9 +1,8 @@
-from http.client import responses
-from services.booking.payload import PayloadBookings
+import allure
+import requests
+from services.booking.payload import PayloadBookings, LOGIN, PASSWORD
 from services.booking.endpoints import EndpointsBooking
 from requests import Response
-import requests
-import allure
 
 
 class Bookings:
@@ -20,18 +19,18 @@ class Bookings:
         return response
 
     @allure.step('Get request for booking by id')
-    def get_booking_by_id(self, id: int) -> Response:
+    def get_booking_by_id(self, booking_id: int) -> Response:
         response = requests.get(
-            url=self.endpoints.get_booking_by_id(id)
+            url=self.endpoints.get_booking_by_id(booking_id)
         )
 
         return response
 
     @allure.step('Auth request to get token')
-    def get_auth_token(self) -> Response:
+    def get_auth_token(self, login = LOGIN, password = PASSWORD) -> Response:
         data = {
-            'username': self.payload.auth_data()[0],
-            'password': self.payload.auth_data()[1]
+            'login': login,
+            'password': password
         }
         response = requests.post(
             self.endpoints.create_token(), json=data
@@ -40,33 +39,40 @@ class Bookings:
         return response
 
     @allure.step('Post request to create booking')
-    def create_booking(self, booking_id: int, **kwargs) -> Response:
+    def post_create_booking(self, **data) -> Response:
         response = requests.post(
-            url=self.endpoints.post_create_booking(booking_id),
-            json=self.payload.post_booking_data(**kwargs)
+            url=self.endpoints.post_create_booking(),
+            json=self.payload.post_booking_data(**data)
         )
         return response
 
     @allure.step('Put request to update booking')
-    def update_booking(self, booking_id: int, **kwargs):
+    def post_update_booking(self, booking_id: int, **data):
         response = requests.post(
             url=self.endpoints.update_booking(booking_id),
-            json=self.payload.post_booking_data(**kwargs)
+            json=self.payload.post_booking_data(**data),
+            auth=self.payload.basic_auth()
         )
         return response
 
     @allure.step('Patch request to partial update booking')
-    def partial_update_booking(self, booking_id: int, **kwargs):
-        data = self.payload.patch_booking_data(**kwargs)
+    def partial_update_booking(self, booking_id: int, **data):
+        data = self.payload.patch_booking_data(**data)
         response = requests.patch(
             url = self.endpoints.update_booking(booking_id),
-            json = self.payload.patch_booking_data(**kwargs),
+            json = self.payload.patch_booking_data(**data),
             auth = self.payload.basic_auth()
         )
+
+        return response
 
     @allure.step('Delete booking request')
     def delete_booking(self, booking_id: int) -> Response:
         response = requests.delete(
-            url=self.endpoints.delete_booking(booking_id)
+            url=self.endpoints.delete_booking(booking_id),
+            auth=self.payload.basic_auth()
         )
         return response
+
+
+

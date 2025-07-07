@@ -31,13 +31,13 @@ class EndpointsBooking:
         return f'{AUTH_URL}'
 
     @staticmethod
-    def post_create_booking(booking_id: int) -> str:
+    def post_create_booking() -> str:
         """
 
         :param booking_id: int, booking id
         :return: POST url-string for api request
         """
-        return f'{BOOKING_URL}{booking_id}'
+        return f'{BOOKING_URL}'
 
     @staticmethod
     def update_booking(booking_id: int) -> str:
